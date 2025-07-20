@@ -2,12 +2,10 @@
 session_start();
 require 'db.php';
 
-// Redirect to login if not logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit();
 }
-
 $uid = $_SESSION['user_id'];
 
 // Unread chat message count
@@ -25,6 +23,24 @@ if ($res && $row = $res->fetch_assoc()) {
 // User's name for greeting
 $resUser = $conn->query("SELECT name FROM users WHERE id='$uid' LIMIT 1");
 $user = $resUser ? $resUser->fetch_assoc() : null;
+
+// Unique Features:
+$quotes = [
+  "Learning never exhausts the mind. – Leonardo da Vinci",
+  "Share your knowledge. It’s a way to achieve immortality. – Dalai Lama",
+  "Everyone you will ever meet knows something you don’t.",
+  "The beautiful thing about learning is nobody can take it away from you. – B.B. King"
+];
+$quote = $quotes[array_rand($quotes)];
+
+$skills_posted = $conn->query("SELECT COUNT(*) as n FROM skills WHERE user_id='$uid'")->fetch_assoc()['n'];
+$badge = 'Beginner';
+if ($skills_posted >= 5) $badge = 'Mentor';
+if ($skills_posted >= 10) $badge = 'Expert';
+$badge_color = ($badge === 'Beginner' ? 'bg-gray-200' : ($badge === 'Mentor' ? 'bg-yellow-200' : 'bg-green-200'));
+
+$suggested_skills = ['Video Editing', 'French Cooking', 'Public Speaking', 'Digital Marketing', 'Photography', 'Meditation', 'JavaScript Basics', 'Guitar for Beginners'];
+$suggest = $suggested_skills[array_rand($suggested_skills)];
 ?>
 
 <!DOCTYPE html>
@@ -57,8 +73,7 @@ $user = $resUser ? $resUser->fetch_assoc() : null;
     <a href="logout.php" class="block bg-red-100 text-red-600 font-bold px-5 py-2 rounded-full shadow hover:bg-red-200 transition">Logout</a>
   </div>
 
-  <!-- Main Dashboard -->
-  <main class="max-w-6xl mx-auto py-16 px-4">
+  <main class="max-w-6xl mx-auto py-12 px-4">
     <div class="bg-white rounded-3xl shadow-xl p-10 text-center">
       <h1 class="text-4xl font-extrabold text-blue-700 mb-2">
         Welcome<?php if ($user) echo ', ' . htmlspecialchars($user['name']); ?>!
@@ -66,55 +81,64 @@ $user = $resUser ? $resUser->fetch_assoc() : null;
       <p class="text-lg text-gray-500 mb-8">
         This is your SkillShare dashboard. Use the menu below to explore all features.
       </p>
-      <div class="grid md:grid-cols-4 gap-8 mt-8">
-        <a href="skills.php" class="bg-gradient-to-br from-blue-100 to-blue-300 p-6 rounded-2xl shadow hover:scale-105 transition-transform text-blue-900 font-bold text-lg flex flex-col items-center">
+      <!-- 3x3 Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+
+        <!-- Card 1 -->
+        <a href="skills.php" class="bg-gradient-to-br from-blue-100 to-blue-300 p-8 rounded-2xl shadow hover:scale-105 transition-transform flex flex-col items-center">
           <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"></path><path d="M12 14l6.16-3.422A12.083 12.083 0 0012 21.5a12.083 12.083 0 00-6.16-10.922L12 14z"></path></svg>
-          Browse Skills
+          <div class="text-xl font-bold text-blue-900">Browse Skills</div>
         </a>
-        <a href="post_skill.php" class="bg-gradient-to-br from-teal-100 to-teal-300 p-6 rounded-2xl shadow hover:scale-105 transition-transform text-teal-900 font-bold text-lg flex flex-col items-center">
+        <!-- Card 2 -->
+        <a href="post_skill.php" class="bg-gradient-to-br from-teal-100 to-teal-300 p-8 rounded-2xl shadow hover:scale-105 transition-transform flex flex-col items-center">
           <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
-          Post a Skill
+          <div class="text-xl font-bold text-teal-900">Post a Skill</div>
         </a>
-        <a href="profile.php" class="bg-gradient-to-br from-purple-100 to-purple-300 p-6 rounded-2xl shadow hover:scale-105 transition-transform text-purple-900 font-bold text-lg flex flex-col items-center relative">
-          <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 14a4 4 0 01-8 0m8 0V8a4 4 0 00-8 0v6m8 0a4 4 0 01-8 0"></path></svg>
-          Profile
-        </a>
-        <a href="notifications.php" class="bg-gradient-to-br from-pink-100 to-pink-300 p-6 rounded-2xl shadow hover:scale-105 transition-transform text-pink-900 font-bold text-lg flex flex-col items-center relative">
-          <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-5-5.917V5a2 2 0 10-4 0v.083A6.002 6.002 0 004 11v3.159c0 .538-.214 1.055-.595 1.436L2 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-          Notifications
+        <!-- Card 3: Unique - Skill Progress -->
+        <div class="bg-gradient-to-br from-purple-100 to-purple-300 p-8 rounded-2xl shadow flex flex-col items-center">
+          <svg class="w-12 h-12 mb-3 text-purple-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+          <div class="text-2xl font-bold text-purple-900"><?= $skills_posted ?></div>
+          <div class="font-bold text-purple-800">My Skills</div>
+          <div class="mt-2">
+            <span class="text-xs px-3 py-1 rounded-full font-bold <?= $badge_color ?>"><?= $badge ?> Badge</span>
+          </div>
+        </div>
+        <!-- Card 4 -->
+        <a href="notifications.php" class="bg-gradient-to-br from-pink-100 to-pink-300 p-8 rounded-2xl shadow hover:scale-105 transition-transform flex flex-col items-center relative">
+          <svg class="w-12 h-12 mb-3 text-pink-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-5-5.917V5a2 2 0 10-4 0v.083A6.002 6.002 0 004 11v3.159c0 .538-.214 1.055-.595 1.436L2 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+          <div class="text-xl font-bold text-pink-900">Notifications</div>
           <?php if ($unread_count > 0): ?>
-            <span class="absolute -top-2 -right-3 bg-red-600 text-white rounded-full text-xs px-2 py-0.5 font-bold animate-pulse"><?php echo $unread_count; ?></span>
+            <span class="absolute top-2 right-4 bg-red-600 text-white rounded-full text-xs px-2 py-0.5 font-bold animate-pulse"><?php echo $unread_count; ?></span>
           <?php endif; ?>
         </a>
-        <a href="connections.php" class="bg-gradient-to-br from-yellow-100 to-yellow-300 p-6 rounded-2xl shadow hover:scale-105 transition-transform text-yellow-900 font-bold text-lg flex flex-col items-center">
-          <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 8a4 4 0 108 0 4 4 0 00-8 0zM3 20a8 8 0 0118 0"></path></svg>
-          My Connections
+        <!-- Card 5 -->
+        <a href="connections.php" class="bg-gradient-to-br from-yellow-100 to-yellow-300 p-8 rounded-2xl shadow hover:scale-105 transition-transform flex flex-col items-center">
+          <svg class="w-12 h-12 mb-3 text-yellow-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 8a4 4 0 108 0 4 4 0 00-8 0zM3 20a8 8 0 0118 0"></path></svg>
+          <div class="text-xl font-bold text-yellow-900">My Connections</div>
         </a>
-        <a href="messages.php" class="bg-gradient-to-br from-cyan-100 to-cyan-300 p-6 rounded-2xl shadow hover:scale-105 transition-transform text-cyan-900 font-bold text-lg flex flex-col items-center">
-          <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8a9 9 0 1118 0z"></path></svg>
-          Messages
-          <?php if ($unread_count > 0): ?>
-            <span class="absolute -top-2 -right-3 bg-red-600 text-white rounded-full text-xs px-2 py-0.5 font-bold animate-pulse"><?php echo $unread_count; ?></span>
-          <?php endif; ?>
+        <!-- Card 6 -->
+        <a href="messages.php" class="bg-gradient-to-br from-cyan-100 to-cyan-300 p-8 rounded-2xl shadow hover:scale-105 transition-transform flex flex-col items-center">
+          <svg class="w-12 h-12 mb-3 text-cyan-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8a9 9 0 1118 0z"></path></svg>
+          <div class="text-xl font-bold text-cyan-900">Messages</div>
         </a>
-        <a href="leaderboard.php" class="bg-gradient-to-br from-green-100 to-green-300 p-6 rounded-2xl shadow hover:scale-105 transition-transform text-green-900 font-bold text-lg flex flex-col items-center">
-          <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-5H7v5H3v2h18v-2h-4v-8h-2v8H9z"></path></svg>
-          Leaderboard
-        </a>
-        <a href="my_reviews.php" class="bg-gradient-to-br from-indigo-100 to-indigo-300 p-6 rounded-2xl shadow hover:scale-105 transition-transform text-indigo-900 font-bold text-lg flex flex-col items-center">
-          <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7"></path></svg>
-          My Reviews
-        </a>
-        <a href="settings.php" class="bg-gradient-to-br from-gray-100 to-gray-300 p-6 rounded-2xl shadow hover:scale-105 transition-transform text-gray-900 font-bold text-lg flex flex-col items-center">
-          <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6V4m0 16v-2m8-8h2M4 12H2m15.364 6.364l1.414 1.414M6.343 6.343l-1.414-1.414m12.728 0l1.414 1.414M6.343 17.657l-1.414 1.414"></path></svg>
-          Settings
+        <!-- Card 7: Unique - Suggest a Skill -->
+        <div class="bg-gradient-to-br from-green-100 to-green-300 p-8 rounded-2xl shadow flex flex-col items-center">
+          <svg class="w-12 h-12 mb-3 text-green-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20l9-5-9-5-9 5 9 5z"></path></svg>
+          <div class="font-bold text-green-800 mb-2">Suggest a Skill</div>
+          <div class="text-green-700 mb-2">How about: <span class="font-semibold"><?= $suggest ?></span>?</div>
+          <a href="post_skill.php" class="mt-2 bg-green-600 text-white px-4 py-1 rounded-full text-xs shadow hover:bg-green-700 transition">Post Now</a>
+        </div>
+        <!-- Card 8: Unique - Quote -->
+        <div class="bg-gradient-to-br from-indigo-100 to-indigo-300 p-8 rounded-2xl shadow flex flex-col items-center">
+          <svg class="w-12 h-12 mb-3 text-indigo-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V7a2 2 0 012-2h2l2-3h6l2 3h2a2 2 0 012 2v12a2 2 0 01-2 2z"></path></svg>
+          <div class="italic text-indigo-700 text-base"><?= $quote ?></div>
+        </div>
+        <!-- Card 9 -->
+        <a href="leaderboard.php" class="bg-gradient-to-br from-gray-100 to-gray-300 p-8 rounded-2xl shadow hover:scale-105 transition-transform flex flex-col items-center">
+          <svg class="w-12 h-12 mb-3 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-5H7v5H3v2h18v-2h-4v-8h-2v8H9z"></path></svg>
+          <div class="text-xl font-bold text-gray-900">Leaderboard</div>
         </a>
       </div>
-      <?php if ($unread_count > 0): ?>
-        <div class="mt-8 text-center">
-          <span class="bg-red-100 text-red-700 rounded px-3 py-1 font-semibold text-sm shadow">You have <?php echo $unread_count; ?> unread chat message<?php echo $unread_count > 1 ? 's' : ''; ?>!</span>
-        </div>
-      <?php endif; ?>
     </div>
   </main>
   <footer class="mt-16 py-8 bg-white text-center shadow-inner text-gray-500">

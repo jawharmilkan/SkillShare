@@ -3,17 +3,18 @@ session_start();
 require 'db.php';
 
 // Handle search/filter (basic demo)
-$where = "WHERE status='active'";
+$where = "WHERE s.status='active'";
 $search = '';
 $category = '';
 
 if (isset($_GET['search']) && $_GET['search'] != '') {
     $search = $conn->real_escape_string($_GET['search']);
-    $where .= " AND (title LIKE '%$search%' OR location LIKE '%$search%' OR description LIKE '%$search%')";
+    // Prefix columns to avoid ambiguity!
+    $where .= " AND (s.title LIKE '%$search%' OR s.location LIKE '%$search%' OR s.description LIKE '%$search%' OR u.name LIKE '%$search%' OR u.location LIKE '%$search%')";
 }
 if (isset($_GET['category']) && $_GET['category'] != '') {
     $category = $conn->real_escape_string($_GET['category']);
-    $where .= " AND category='$category'";
+    $where .= " AND s.category='$category'";
 }
 
 $sql = "SELECT s.*, u.name as user_name FROM skills s JOIN users u ON s.user_id = u.id $where ORDER BY s.created_at DESC";
@@ -21,13 +22,12 @@ $res = $conn->query($sql);
 
 // Pre-fetch all ratings for visible skills in one query for efficiency
 $skill_ids = [];
+$skills = [];
 if ($res && $res->num_rows > 0) {
     while ($row = $res->fetch_assoc()) {
         $skills[] = $row;
         $skill_ids[] = $row['id'];
     }
-} else {
-    $skills = [];
 }
 $ratings_map = [];
 if (count($skill_ids)) {
@@ -37,16 +37,6 @@ if (count($skill_ids)) {
         while ($r = $rating_res->fetch_assoc()) {
             $ratings_map[$r['skill_id']] = ['n' => $r['n'], 'avg' => round($r['avg_rating'],1)];
         }
-    }
-}
-
-// Fetch pending requests for the logged-in user, to disable already requested skills
-$requested_skills = [];
-if (isset($_SESSION['user_id'])) {
-    $uid = $_SESSION['user_id'];
-    $rq = $conn->query("SELECT skill_id FROM requests WHERE requester_id=$uid AND status='pending'");
-    while ($rq && $row = $rq->fetch_assoc()) {
-        $requested_skills[$row['skill_id']] = true;
     }
 }
 ?>
@@ -83,7 +73,7 @@ if (isset($_SESSION['user_id'])) {
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
       <h1 class="text-3xl font-bold text-blue-800">Browse Skills</h1>
       <form class="flex items-center gap-2" method="GET" action="skills.php">
-        <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search skills or location..." class="px-4 py-2 rounded-xl border border-gray-300 focus:outline-blue-400 w-60 shadow-sm" />
+        <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search skills, user or location..." class="px-4 py-2 rounded-xl border border-gray-300 focus:outline-blue-400 w-60 shadow-sm" />
         <select name="category" class="px-4 py-2 rounded-xl border border-gray-300 focus:outline-blue-400 shadow-sm">
           <option value="">All</option>
           <option value="Design" <?php if($category=='Design') echo 'selected'; ?>>Design</option>
@@ -102,7 +92,6 @@ if (isset($_SESSION['user_id'])) {
         <?php
         if ($_GET['msg'] == 'request_sent') echo "Request sent!";
         if ($_GET['msg'] == 'already_requested') echo "You have already sent a request for this skill.";
-        if ($_GET['msg'] == 'cannot_request_own_skill') echo "You cannot request your own skill!";
         ?>
       </div>
     <?php endif; ?>
@@ -141,19 +130,6 @@ if (isset($_SESSION['user_id'])) {
           <a href="skill_detail.php?id=<?php echo $row['id']; ?>" class="mt-2 bg-blue-600 text-white px-5 py-2 rounded-full shadow hover:bg-blue-700 transition-all font-bold">
             View
           </a>
-          
-          <!-- REQUEST CONNECTION BUTTON (NEW) -->
-          <?php if (isset($_SESSION['user_id']) && $row['user_id'] != $_SESSION['user_id']): ?>
-            <?php if (isset($requested_skills[$row['id']])): ?>
-              <button disabled class="mt-3 bg-gray-300 text-gray-600 px-4 py-1 rounded-full shadow cursor-not-allowed font-semibold">Requested</button>
-            <?php else: ?>
-              <form method="post" action="send_request.php" class="mt-3">
-                <input type="hidden" name="skill_id" value="<?php echo $row['id']; ?>">
-                <button type="submit" class="bg-blue-600 text-white px-4 py-1 rounded-full shadow hover:bg-blue-700 transition">Request Connection</button>
-              </form>
-            <?php endif; ?>
-          <?php endif; ?>
-          <!-- END REQUEST CONNECTION BUTTON -->
         </div>
         <?php endforeach; ?>
       <?php else: ?>
