@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SkillShare - Browse Skills</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-r from-blue-50 to-teal-50 min-h-screen">
+  <!-- Header (Same as Homepage) -->
+  <header class="flex items-center justify-between px-6 py-4 bg-white shadow-lg">
+    <div class="text-2xl font-bold text-blue-700">SkillShare</div>
+    <nav class="space-x-4 hidden md:flex">
+      <a href="index.html" class="hover:text-blue-500">Home</a>
+      <a href="browse.html" class="text-blue-600 font-semibold">Browse Skills</a>
+      <a href="post-skill.html" class="hover:text-blue-500">Post Skill</a>
+      <a href="profile.html" class="hover:text-blue-500">Profile</a>
+    </nav>
+    <button id="menu-btn" class="block md:hidden text-2xl text-blue-700 focus:outline-none">&#9776;</button>
+  </header>
+  <div id="mobile-menu" class="md:hidden bg-white px-6 py-4 space-y-2 hidden shadow-lg">
+    <a href="index.html" class="block hover:text-blue-500">Home</a>
+    <a href="browse.html" class="block text-blue-600 font-semibold">Browse Skills</a>
+    <a href="post-skill.html" class="block hover:text-blue-500">Post Skill</a>
+    <a href="profile.html" class="block hover:text-blue-500">Profile</a>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto py-10 px-4">
+    <!-- Title and Search -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+      <h1 class="text-3xl font-bold text-blue-800">Browse Skills</h1>
+      <div class="flex items-center gap-2">
+        <input type="text" id="search" placeholder="Search skills or location..." class="px-4 py-2 rounded-xl border border-gray-300 focus:outline-blue-400 w-60 shadow-sm" />
+        <button class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition">Search</button>
+      </div>
+    </div>
+
+    <!-- Category Filters (Static for now) -->
+    <div class="flex flex-wrap gap-2 mb-6">
+      <button class="bg-teal-100 text-teal-800 px-4 py-2 rounded-full font-semibold hover:bg-teal-200">All</button>
+      <button class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold hover:bg-blue-200">Design</button>
+      <button class="bg-purple-100 text-purple-800 px-4 py-2 rounded-full font-semibold hover:bg-purple-200">Music</button>
+      <button class="bg-pink-100 text-pink-800 px-4 py-2 rounded-full font-semibold hover:bg-pink-200">Cooking</button>
+      <button class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full font-semibold hover:bg-orange-200">IT</button>
+      <!-- Add more categories -->
+    </div>
+
+    <!-- Skills Grid (with animation) -->
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8" id="skills-grid">
+      <!-- Skill Card 1 -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center hover:scale-105 transition-transform duration-300 group">
+        <img src="https://randomuser.me/api/portraits/men/11.jpg" class="w-16 h-16 rounded-full mb-4 shadow-lg group-hover:rotate-6 transition-transform duration-300" alt="profile">
+        <h3 class="font-bold text-lg mb-1">Logo Design</h3>
+        <p class="text-gray-500 mb-2">Rahim, Coventry</p>
+        <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold mb-2">Design</span>
+        <button class="mt-auto bg-blue-600 text-white px-4 py-2 rounded-full shadow-md hover:bg-blue-700 transition-all">Connect</button>
+      </div>
+      <!-- Skill Card 2 -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center hover:scale-105 transition-transform duration-300 group">
+        <img src="https://randomuser.me/api/portraits/women/22.jpg" class="w-16 h-16 rounded-full mb-4 shadow-lg group-hover:rotate-6 transition-transform duration-300" alt="profile">
+        <h3 class="font-bold text-lg mb-1">Piano Lessons</h3>
+        <p class="text-gray-500 mb-2">Jade, Birmingham</p>
+        <span class="bg-purple-100 text-purple-800 text-xs px-3 py-1 rounded-full font-semibold mb-2">Music</span>
+        <button class="mt-auto bg-blue-600 text-white px-4 py-2 rounded-full shadow-md hover:bg-blue-700 transition-all">Connect</button>
+      </div>
+      <!-- Skill Card 3 -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center hover:scale-105 transition-transform duration-300 group">
+        <img src="https://randomuser.me/api/portraits/men/33.jpg" class="w-16 h-16 rounded-full mb-4 shadow-lg group-hover:rotate-6 transition-transform duration-300" alt="profile">
+        <h3 class="font-bold text-lg mb-1">Gourmet Cooking</h3>
+        <p class="text-gray-500 mb-2">Alex, London</p>
+        <span class="bg-pink-100 text-pink-800 text-xs px-3 py-1 rounded-full font-semibold mb-2">Cooking</span>
+        <button class="mt-auto bg-blue-600 text-white px-4 py-2 rounded-full shadow-md hover:bg-blue-700 transition-all">Connect</button>
+      </div>
+      <!-- Add more cards for demo -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center hover:scale-105 transition-transform duration-300 group">
+        <img src="https://randomuser.me/api/portraits/men/45.jpg" class="w-16 h-16 rounded-full mb-4 shadow-lg group-hover:rotate-6 transition-transform duration-300" alt="profile">
+        <h3 class="font-bold text-lg mb-1">Video Editing</h3>
+        <p class="text-gray-500 mb-2">Tom, Manchester</p>
+        <span class="bg-orange-100 text-orange-800 text-xs px-3 py-1 rounded-full font-semibold mb-2">IT</span>
+        <button class="mt-auto bg-blue-600 text-white px-4 py-2 rounded-full shadow-md hover:bg-blue-700 transition-all">Connect</button>
+      </div>
+      <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center hover:scale-105 transition-transform duration-300 group">
+        <img src="https://randomuser.me/api/portraits/women/55.jpg" class="w-16 h-16 rounded-full mb-4 shadow-lg group-hover:rotate-6 transition-transform duration-300" alt="profile">
+        <h3 class="font-bold text-lg mb-1">UX/UI Research</h3>
+        <p class="text-gray-500 mb-2">Priya, Leicester</p>
+        <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold mb-2">Design</span>
+        <button class="mt-auto bg-blue-600 text-white px-4 py-2 rounded-full shadow-md hover:bg-blue-700 transition-all">Connect</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-16 py-8 bg-white text-center shadow-inner text-gray-500">
+    &copy; 2025 SkillShare. Built for your local community.
+  </footer>
+
+  <!-- Main JS -->
+  <script>
+    // Hamburger menu logic
+    document.getElementById('menu-btn').addEventListener('click', function() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    });
+  </script>
+</body>
+</html>
